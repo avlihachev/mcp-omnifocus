@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import type { OmniFocusProvider, OmniFocusTask, CreateTaskInput, UpdateTaskInput, OmniFocusConfig } from "../types.js";
+import { DEFAULT_TASK_LIMIT } from "../types.js";
 
 async function runAppleScript(script: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -35,7 +36,7 @@ async function runAppleScript(script: string): Promise<string> {
   });
 }
 
-function escapeAppleScriptString(str: string): string {
+export function escapeAppleScriptString(str: string): string {
   return str
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
@@ -46,7 +47,7 @@ function escapeAppleScriptString(str: string): string {
 
 export class AppleScriptProvider implements OmniFocusProvider {
   version = "pro" as const;
-  config: OmniFocusConfig = { directSqlAccess: false };
+  config: OmniFocusConfig = { directSqlAccess: false, taskLimit: DEFAULT_TASK_LIMIT };
 
   setConfig(newConfig: Partial<OmniFocusConfig>): void {
     // AppleScript provider doesn't use SQL, config is ignored
@@ -83,7 +84,10 @@ export class AppleScriptProvider implements OmniFocusProvider {
               set end of taskList to taskId & "|||" & taskName & "|||" & taskNote & "|||" & taskFlagged & "|||" & taskDue & "|||" & projectName
             end if
           end repeat
-          return taskList
+          set AppleScript's text item delimiters to "
+---TASK---
+"
+          return taskList as text
         end tell
       end tell
     `;
@@ -91,7 +95,8 @@ export class AppleScriptProvider implements OmniFocusProvider {
     const result = await runAppleScript(script);
     if (!result) return [];
 
-    return result.split(", ").map(line => {
+    // use newline-based delimiter to handle commas in task names
+    return result.split("\n---TASK---\n").map(line => {
       const [id, name, note, flagged, dueDate, project] = line.split("|||");
       return {
         id,
@@ -206,13 +211,16 @@ export class AppleScriptProvider implements OmniFocusProvider {
               set end of projectNames to name of p
             end if
           end repeat
-          return projectNames
+          set AppleScript's text item delimiters to "
+---PROJECT---
+"
+          return projectNames as text
         end tell
       end tell
     `;
 
     const result = await runAppleScript(script);
     if (!result) return [];
-    return result.split(", ");
+    return result.split("\n---PROJECT---\n");
   }
 }

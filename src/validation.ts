@@ -57,6 +57,7 @@ export const GetTasksInputSchema = z.object({
 
 export const SetConfigInputSchema = z.object({
   directSqlAccess: z.boolean().optional(),
+  taskLimit: z.number().int().min(1).max(10000).optional(),
 });
 
 export type ValidatedCreateTaskInput = z.infer<typeof CreateTaskInputSchema>;

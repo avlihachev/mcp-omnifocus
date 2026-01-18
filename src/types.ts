@@ -36,7 +36,10 @@ export type OmniFocusVersion = "pro" | "standard";
 
 export interface OmniFocusConfig {
   directSqlAccess: boolean;
+  taskLimit: number;
 }
+
+export const DEFAULT_TASK_LIMIT = 500;
 
 export interface OmniFocusProvider {
   config: OmniFocusConfig;

@@ -1,0 +1,8 @@
+src/
+dist/__tests__/
+tsconfig.json
+vitest.config.ts
+.git*
+*.log
+.DS_Store
+coverage/

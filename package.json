@@ -1,17 +1,39 @@
 {
   "name": "mcp-omnifocus",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "MCP server for OmniFocus with auto-detection of Pro/Standard version",
+  "author": "Mikhail Lihachev",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lihachev/mcp-omnifocus"
+  },
+  "keywords": [
+    "mcp",
+    "omnifocus",
+    "claude",
+    "anthropic",
+    "productivity",
+    "task-management"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "bin": {
     "mcp-omnifocus": "dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build && npm test"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
@@ -21,7 +43,9 @@
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "@vitest/coverage-v8": "^4.0.17",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.17"
   },
   "engines": {
     "node": ">=18"

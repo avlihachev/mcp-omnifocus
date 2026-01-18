@@ -6,8 +6,12 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { createRequire } from "module";
 
 import { ZodError } from "zod";
+
+const require = createRequire(import.meta.url);
+const { version: PACKAGE_VERSION } = require("../package.json");
 import { detectVersion } from "./version-detector.js";
 import { AppleScriptProvider } from "./providers/applescript.js";
 import { UrlSchemeProvider } from "./providers/url-scheme.js";
@@ -41,7 +45,7 @@ let provider: OmniFocusProvider;
 const server = new Server(
   {
     name: "mcp-omnifocus",
-    version: "1.0.0",
+    version: PACKAGE_VERSION,
   },
   {
     capabilities: {
@@ -171,6 +175,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             directSqlAccess: {
               type: "boolean",
               description: "Enable direct SQLite access for write operations (Standard version only)"
+            },
+            taskLimit: {
+              type: "number",
+              description: "Maximum number of tasks to return from getTasks (default: 500, max: 10000)"
             }
           }
         }

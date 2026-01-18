@@ -27,7 +27,9 @@ function runAppleScriptCheck(script: string): Promise<{ success: boolean; stderr
   });
 }
 
-export async function detectVersion(): Promise<OmniFocusVersion> {
+const VERSION_DETECTION_TIMEOUT_MS = 5000;
+
+async function detectVersionInternal(): Promise<OmniFocusVersion> {
   const script = 'tell application "OmniFocus" to get name of first flattened task';
   const result = await runAppleScriptCheck(script);
 
@@ -47,4 +49,15 @@ export async function detectVersion(): Promise<OmniFocusVersion> {
 
   // default to standard if we can't determine
   return "standard";
+}
+
+export async function detectVersion(): Promise<OmniFocusVersion> {
+  const timeout = new Promise<OmniFocusVersion>((resolve) => {
+    setTimeout(() => {
+      console.error("[mcp-omnifocus] Version detection timed out, falling back to standard");
+      resolve("standard");
+    }, VERSION_DETECTION_TIMEOUT_MS);
+  });
+
+  return Promise.race([detectVersionInternal(), timeout]);
 }
