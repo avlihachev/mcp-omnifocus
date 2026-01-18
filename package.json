@@ -2,6 +2,7 @@
   "name": "mcp-omnifocus",
   "version": "1.0.0",
   "description": "MCP server for OmniFocus with auto-detection of Pro/Standard version",
+  "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
