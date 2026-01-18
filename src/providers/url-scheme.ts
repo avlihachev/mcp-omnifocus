@@ -97,7 +97,8 @@ export class UrlSchemeProvider implements OmniFocusProvider {
       params.set("project", input.project);
     }
 
-    const url = `omnifocus:///add?${params.toString()}`;
+    // URLSearchParams encodes spaces as '+', but OmniFocus expects '%20'
+    const url = `omnifocus:///add?${params.toString().replace(/\+/g, '%20')}`;
     await execFileAsync("open", [url]);
 
     return {
