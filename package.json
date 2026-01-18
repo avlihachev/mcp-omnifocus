@@ -1,0 +1,28 @@
+{
+  "name": "mcp-omnifocus",
+  "version": "1.0.0",
+  "description": "MCP server for OmniFocus with auto-detection of Pro/Standard version",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-omnifocus": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "better-sqlite3": "^11.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
