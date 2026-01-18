@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import type { OmniFocusProvider, OmniFocusTask, CreateTaskInput, UpdateTaskInput } from "../types.js";
+import type { OmniFocusProvider, OmniFocusTask, CreateTaskInput, UpdateTaskInput, OmniFocusConfig } from "../types.js";
 
 async function runAppleScript(script: string): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -46,6 +46,12 @@ function escapeAppleScriptString(str: string): string {
 
 export class AppleScriptProvider implements OmniFocusProvider {
   version = "pro" as const;
+  config: OmniFocusConfig = { directSqlAccess: false };
+
+  setConfig(newConfig: Partial<OmniFocusConfig>): void {
+    // AppleScript provider doesn't use SQL, config is ignored
+    Object.assign(this.config, newConfig);
+  }
 
   async getTasks(filter?: "flagged" | "due_today" | "all"): Promise<OmniFocusTask[]> {
     let condition = "";

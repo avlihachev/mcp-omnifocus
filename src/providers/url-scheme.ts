@@ -2,25 +2,29 @@ import { execFile } from "child_process";
 import { promisify } from "util";
 import { homedir } from "os";
 import Database from "better-sqlite3";
-import type { OmniFocusProvider, OmniFocusTask, CreateTaskInput, UpdateTaskInput } from "../types.js";
+import type { OmniFocusProvider, OmniFocusTask, CreateTaskInput, UpdateTaskInput, OmniFocusConfig } from "../types.js";
 
 const execFileAsync = promisify(execFile);
 
 const DB_PATH = `${homedir()}/Library/Group Containers/34YW5XSRB7.com.omnigroup.OmniFocus/com.omnigroup.OmniFocus4/com.omnigroup.OmniFocusModel/OmniFocusDatabase.db`;
 
-function getDatabase(): Database.Database {
-  return new Database(DB_PATH, { readonly: false, fileMustExist: true });
+function getDatabase(readonly = true): Database.Database {
+  return new Database(DB_PATH, { readonly, fileMustExist: true });
 }
 
 export class UrlSchemeProvider implements OmniFocusProvider {
   version = "standard" as const;
+  config: OmniFocusConfig = { directSqlAccess: true };
+
+  setConfig(newConfig: Partial<OmniFocusConfig>): void {
+    Object.assign(this.config, newConfig);
+  }
 
   async getTasks(filter?: "flagged" | "due_today" | "all"): Promise<OmniFocusTask[]> {
-    const db = getDatabase();
+    const db = getDatabase(true);
 
     try {
       let whereClause = "t.dateCompleted IS NULL";
-      const params: Record<string, unknown> = {};
 
       if (filter === "flagged") {
         whereClause += " AND t.flagged = 1";
@@ -46,7 +50,7 @@ export class UrlSchemeProvider implements OmniFocusProvider {
         LIMIT 100
       `;
 
-      const rows = db.prepare(query).all(params) as Array<{
+      const rows = db.prepare(query).all() as Array<{
         id: string;
         name: string;
         note: string | null;
@@ -97,7 +101,14 @@ export class UrlSchemeProvider implements OmniFocusProvider {
   }
 
   async updateTask(input: UpdateTaskInput): Promise<{ success: boolean; warning?: string }> {
-    const db = getDatabase();
+    if (!this.config.directSqlAccess) {
+      return {
+        success: false,
+        warning: "Direct SQL access is disabled. Update operations require directSqlAccess=true or OmniFocus Pro. Use omnifocus_set_config to enable it."
+      };
+    }
+
+    const db = getDatabase(false);
 
     try {
       const updates: string[] = [];
@@ -147,7 +158,14 @@ export class UrlSchemeProvider implements OmniFocusProvider {
   }
 
   async completeTask(taskId: string): Promise<{ success: boolean; warning?: string }> {
-    const db = getDatabase();
+    if (!this.config.directSqlAccess) {
+      return {
+        success: false,
+        warning: "Direct SQL access is disabled. Complete operations require directSqlAccess=true or OmniFocus Pro. Use omnifocus_set_config to enable it."
+      };
+    }
+
+    const db = getDatabase(false);
 
     try {
       const now = new Date();
@@ -171,7 +189,7 @@ export class UrlSchemeProvider implements OmniFocusProvider {
   }
 
   async getProjects(): Promise<string[]> {
-    const db = getDatabase();
+    const db = getDatabase(true);
 
     try {
       const query = `

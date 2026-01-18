@@ -34,7 +34,13 @@ export interface CompleteTaskInput {
 
 export type OmniFocusVersion = "pro" | "standard";
 
+export interface OmniFocusConfig {
+  directSqlAccess: boolean;
+}
+
 export interface OmniFocusProvider {
+  config: OmniFocusConfig;
+  setConfig(config: Partial<OmniFocusConfig>): void;
   version: OmniFocusVersion;
   getTasks(filter?: "flagged" | "due_today" | "all"): Promise<OmniFocusTask[]>;
   createTask(input: CreateTaskInput): Promise<{ success: boolean; taskId?: string; warning?: string }>;

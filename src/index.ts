@@ -16,6 +16,7 @@ import {
   UpdateTaskInputSchema,
   CompleteTaskInputSchema,
   GetTasksInputSchema,
+  SetConfigInputSchema,
 } from "./validation.js";
 import type { OmniFocusProvider } from "./types.js";
 
@@ -152,6 +153,27 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: "object",
           properties: {}
         }
+      },
+      {
+        name: "omnifocus_get_config",
+        description: "Get current configuration settings",
+        inputSchema: {
+          type: "object",
+          properties: {}
+        }
+      },
+      {
+        name: "omnifocus_set_config",
+        description: "Update configuration settings. For Standard version: directSqlAccess controls whether to use direct SQLite access for update/complete operations (faster but requires OmniFocus restart to sync)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            directSqlAccess: {
+              type: "boolean",
+              description: "Enable direct SQLite access for write operations (Standard version only)"
+            }
+          }
+        }
       }
     ]
   };
@@ -212,6 +234,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [{
             type: "text",
             text: JSON.stringify({ version: provider.version, projects }, null, 2)
+          }]
+        };
+      }
+
+      case "omnifocus_get_config": {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              version: provider.version,
+              config: provider.config
+            }, null, 2)
+          }]
+        };
+      }
+
+      case "omnifocus_set_config": {
+        const input = SetConfigInputSchema.parse(args ?? {});
+        provider.setConfig(input);
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify({
+              success: true,
+              version: provider.version,
+              config: provider.config
+            }, null, 2)
           }]
         };
       }

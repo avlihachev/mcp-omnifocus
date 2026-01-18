@@ -55,7 +55,12 @@ export const GetTasksInputSchema = z.object({
   filter: z.enum(["flagged", "due_today", "all"]).optional(),
 });
 
+export const SetConfigInputSchema = z.object({
+  directSqlAccess: z.boolean().optional(),
+});
+
 export type ValidatedCreateTaskInput = z.infer<typeof CreateTaskInputSchema>;
 export type ValidatedUpdateTaskInput = z.infer<typeof UpdateTaskInputSchema>;
 export type ValidatedCompleteTaskInput = z.infer<typeof CompleteTaskInputSchema>;
 export type ValidatedGetTasksInput = z.infer<typeof GetTasksInputSchema>;
+export type ValidatedSetConfigInput = z.infer<typeof SetConfigInputSchema>;
