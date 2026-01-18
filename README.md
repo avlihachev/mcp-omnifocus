@@ -1,5 +1,7 @@
 # MCP OmniFocus
 
+[![npm version](https://img.shields.io/npm/v/mcp-omnifocus.svg)](https://www.npmjs.com/package/mcp-omnifocus)
+
 MCP server for OmniFocus with auto-detection of Pro/Standard version.
 
 ## Features
@@ -22,13 +24,22 @@ MCP server for OmniFocus with auto-detection of Pro/Standard version.
 
 ## Installation
 
+### Via npm (recommended)
+
 ```bash
-cd ~/Projects/mcp-omnifocus
+npx mcp-omnifocus
+```
+
+### From source
+
+```bash
+git clone https://github.com/avlihachev/mcp-omnifocus.git
+cd mcp-omnifocus
 npm install
 npm run build
 ```
 
-## Claude Code Configuration
+## Claude Desktop Configuration
 
 Add to `~/.claude/claude_desktop_config.json`:
 
@@ -36,8 +47,21 @@ Add to `~/.claude/claude_desktop_config.json`:
 {
   "mcpServers": {
     "omnifocus": {
+      "command": "npx",
+      "args": ["mcp-omnifocus"]
+    }
+  }
+}
+```
+
+Or if installed from source:
+
+```json
+{
+  "mcpServers": {
+    "omnifocus": {
       "command": "node",
-      "args": ["/Users/YOUR_USERNAME/Projects/mcp-omnifocus/dist/index.js"]
+      "args": ["/path/to/mcp-omnifocus/dist/index.js"]
     }
   }
 }
